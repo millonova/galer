@@ -5,62 +5,69 @@
     $nama_user = "User Not Found";
     $username = "N/A";
     $edit_button = '';
-    $post_button = '';
-    $post1_button = '';
+    $delete_button = '';
+    $name_album = ""; // Define the variable
+    $deskripsi = ""; // Define the variable
 
     // Get the user ID from the URL
-    if (isset($_GET['id_user'])) {
-        $id_user = isset($_GET['id_user']) ? $_GET['id_user'] : null;
+    if (isset($_GET['id_album'])) {
+        $id_album = isset($_GET['id_album']) ? $_GET['id_album'] : null;
+        
+        $query2 = "SELECT user.id_user FROM user INNER JOIN album ON user.id_user = album.id_user WHERE album.id_album = :id_album";
+		$stmt2 = $conn->prepare($query2);
+		$stmt2->bindParam(':id_album', $id_album, PDO::PARAM_INT);
+		$stmt2->execute();
+		$user_data = $stmt2->fetch(PDO::FETCH_ASSOC);
 
-        // Check if the session ID matches the ID retrieved from the URL
-		$edit_button = '';
-		if(isset($_SESSION['id_user']) && $_SESSION['id_user'] == $id_user) {
-			$edit_button = '<button class="btn btn-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/editprofile.php\'">Edit Profile</button>';
-			$post_button = '<button class="btn btn-outline-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/postphoto.php\'">Post Image</button>';
-			$post1_button = '<button class="btn btn-outline-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/postalbum.php\'">Post Album</button>';
+		if ($user_data) {
+			// User id found
+			$id_user = $user_data['id_user'];
+		} else {
+			// User id not found
+			$id_user = null; // Set id_user to null if not found
 		}
         // Query the database to fetch user information
-        $user_query = "SELECT * FROM user WHERE id_user = :id_user";
+        if(isset($_SESSION['id_user']) && $_SESSION['id_user'] == $id_user) {
+            $edit_button = '<button class="btn btn-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/editalbum.php\'">Edit Album</button>';
+            $delete_button = '<button class="btn btn-outline-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/deletealbum.php?id_album=' . $id_album . '\'">Delete Album</button>';
+        }
+
+        $user_query = "SELECT user.id_user, user.nama_user, user.username, album.nama_album, album.deskripsi FROM user
+                        INNER JOIN album ON user.id_user = album.id_user
+                        WHERE album.id_album = :id_album";
         $user_stmt = $conn->prepare($user_query);
-        $user_stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+        $user_stmt->bindParam(':id_album', $id_album, PDO::PARAM_INT);
         $user_stmt->execute();
         $user_data = $user_stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user_data) {
             // Assign user details if found
+            $id_user = $user_data['id_user'];
             $nama_user = $user_data['nama_user'];
             $username = $user_data['username'];
+            $name_album = $user_data['nama_album']; // Assign album name
+            $deskripsi = $user_data['deskripsi']; // Assign album name
 
-            // Query the database to fetch photos associated with the user
-            $photo_query = "SELECT Lokasi_File FROM foto WHERE id_user = :id_user";
+            // Fetch all photos associated with the user and specific album
+            $photo_query = "SELECT foto.* FROM foto
+                            INNER JOIN album ON foto.id_album = album.id_album
+                            WHERE album.id_album = :id_album AND foto.id_user = :id_user";
             $photo_stmt = $conn->prepare($photo_query);
             $photo_stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+            $photo_stmt->bindParam(':id_album', $id_album, PDO::PARAM_INT);
             $photo_stmt->execute();
 
-            // Fetch all photos associated with the user
-            $photos = $photo_stmt->fetchAll(PDO::FETCH_ASSOC);
-            $lokasi_fotos = array_column($photos, 'lokasi_file');
+            // Fetch all photos associated with the user and specific album
+            $result = $photo_stmt->fetchAll(PDO::FETCH_ASSOC);
         } else {
             // Handle the case where the user ID was not found
             echo "User not found.";
         }
     }
-	$sql = "SELECT * FROM foto AS j 
-    INNER JOIN user AS u ON j.id_user = u.id_user
-    INNER JOIN album AS t ON j.id_album = t.id_album
-    WHERE j.id_user = :id_user
-    ORDER BY j.tgl_unggah ASC";
-
-// Prepare and execute the query
-	$stmt = $conn->prepare($sql);
-	$stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
-	$stmt->execute();
-	$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-    // Close the database connection (if needed, depending on your connection method)
-    // $conn = null;
 ?>
+
+
+
 
 <!DOCTYPE html>  
 <html>  
@@ -78,32 +85,16 @@
         require_once("../layouts/navbar.php");
     ?>
     <main role="main">
-        
-    <div class="jumbotron border-round-0 min-50vh" style="background-image:url(https://images.unsplash.com/photo-1522204657746-fccce0824cfd?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=84b5e9bea51f72c63862a0544f76e0a3&auto=format&fit=crop&w=1500&q=80);">
-    </div>
+
     <div class="container mb-4">
-    	<img src="../assets/img/av.png" class="mt-neg100 mb-4 rounded-circle" width="128">
-        <div class="row">
-            <div class="col-lg-10">
-    	        <h1 class="font-weight-bold title"><?php echo $nama_user; ?></h1>
-                <p>
-                    <?php echo $username; ?>
-                </p>
-            </div>
-            <div class="col-lg-2 align-items-center">
-                <?php echo $edit_button; ?>
-                <?php echo $post_button; ?>
-                <?php echo $post1_button; ?>
-            </div>
+    <h1 class="font-weight-bold title"><?php echo $name_album;?></h1>
+    <h6 class="title"><?php echo $deskripsi;?></h6>
+    <div class="row justify-content-center">
+        <div class="col-lg-12 align-items-center mb-5">
+            <!-- Inside your HTML body -->
+            <?php echo $edit_button; ?>
+            <?php echo $delete_button; ?>
         </div>
-        <ul class="nav nav-underline">
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="http://localhost/galer/docs/profile/user.php?id_user=<?php echo $id_user; ?>">Image</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-black fw-semibold" href="http://localhost/galer/docs/profile/user-album.php?id_user=<?php echo $id_user; ?>">Album</a>
-        </li>
-        </ul>
     </div>
     <div class="container-fluid mb-5">
     	<div class="row">

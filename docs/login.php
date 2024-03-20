@@ -65,7 +65,7 @@
                         }
             
                         // Redirect to profile page
-                        header("Location: profile.php");
+                        header("Location: http://localhost/galer/docs/.php");
                         exit();
                     } else {
                         // Incorrect password

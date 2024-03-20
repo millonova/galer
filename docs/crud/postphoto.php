@@ -56,6 +56,11 @@ if (isset($_POST['daftar'])) {
         echo $error;
     }
 }
+$query = "SELECT id_album, nama_album FROM album WHERE id_user = :id_user";
+$stmt = $conn->prepare($query);
+$stmt->bindParam(':id_user', $_SESSION['id_user'], PDO::PARAM_INT);
+$stmt->execute();
+$albums = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 
@@ -91,11 +96,11 @@ if (isset($_POST['daftar'])) {
                 <div class="form-floating mb-3">
                 </div>
                 <div class="">
-                    <select name="id_album" class="form-select mb-3"
-                        aria-label=".form-select-lg example">
+                    <select name="id_album" class="form-select mb-3" aria-label=".form-select-lg example">
                         <option selected hidden disabled value="">Pilih Album</option>
-                        <option value="1">Makanan</option>
-                        <option value="2">Minuman</option>
+                        <?php foreach ($albums as $album): ?>
+                            <option value="<?php echo $album['id_album']; ?>"><?php echo $album['nama_album']; ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="mb-3">
