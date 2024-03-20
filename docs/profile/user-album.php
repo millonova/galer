@@ -87,10 +87,10 @@
         </div>
         <ul class="nav nav-underline">
         <li class="nav-item">
-            <a class="nav-link text-black fw-semibold" aria-current="page" href="#">Image</a>
+            <a class="nav-link text-black fw-semibold" aria-current="page" href="http://localhost/galer/docs/profile/user.php?id_user=<?php echo $id_user; ?>">Image</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link active" href="#">Album</a>
+            <a class="nav-link active" href="http://localhost/galer/docs/profile/user-album.php?id_user=<?php echo $id_user; ?>">Album</a>
         </li>
         </ul>
     </div>
