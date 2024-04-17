@@ -1,9 +1,6 @@
 <?php
     // Start session
     session_start();
-    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-    header("Cache-Control: post-check=0, pre-check=0", false);
-    header("Pragma: no-cache");
     require_once("db/conn.php");
     $nama_user = "User Not Found";
     $username = "N/A";
@@ -65,9 +62,10 @@
         FROM user AS j 
         INNER JOIN foto AS u ON j.id_user = u.id_user
         INNER JOIN album AS t ON u.id_album = t.id_album
-        WHERE j.id_user = :id_user"; 
+        WHERE u.id_foto = :id_foto";  // Changed to use id_foto instead of id_user
+    
         $user_stmt = $conn->prepare($user_query);
-        $user_stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT); // Bind id_user retrieved from URL
+        $user_stmt->bindParam(':id_foto', $id_foto, PDO::PARAM_INT); // Bind id_user retrieved from URL
         $user_stmt->execute();
         $user_data = $user_stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -81,10 +79,15 @@
             $tgl_unggah = $user_data['tgl_unggah'];
 
             // Fetch all photos associated with the user
-            $photo_query = "SELECT lokasi_file FROM foto WHERE id_user = :id_user";
+            $photo_query = "SELECT lokasi_file FROM foto WHERE id_foto = :id_foto";
             $photo_stmt = $conn->prepare($photo_query);
-            $photo_stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT); // Bind id_user retrieved from URL
+            $photo_stmt->bindParam(':id_foto', $id_foto, PDO::PARAM_INT);
             $photo_stmt->execute();
+            $photo = $photo_stmt->fetch(PDO::FETCH_ASSOC);
+            if ($photo) {
+                $lokasi_file = $photo['lokasi_file'];
+            }
+            
 
             // Fetch all photos associated with the user
             $photos = $photo_stmt->fetchAll(PDO::FETCH_ASSOC);
