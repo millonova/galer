@@ -17,11 +17,6 @@
     $lokasi_file = "";
     $comments = array(); // Initialize comments array
     // Assume $id_foto and $_SESSION['id_user'] are already defined and valid
-
-// Then, use $isLiked to set the button text accordingly
-
-
-
     // Update $isLiked based on whether the count is greater than 0
 
     // Get the user ID from the URL
@@ -114,23 +109,43 @@
             $lokasi_file = ""; // Set all user-related data to empty
         }
 
+        if (isset($_POST['like_action'])) {
+            if ($_POST['like_action'] === 'Like' && isset($_SESSION['id_user'])) {
+                // Insert like into database
+                $insert_like_sql = "INSERT INTO likes (id_foto, id_user) VALUES (:id_foto, :id_user)";
+                $insert_like_stmt = $conn->prepare($insert_like_sql);
+                $insert_like_stmt->bindParam(':id_foto', $id_foto, PDO::PARAM_INT);
+                $insert_like_stmt->bindParam(':id_user', $_SESSION['id_user'], PDO::PARAM_INT);
+                $insert_like_stmt->execute();
+            } elseif ($_POST['like_action'] === 'Unlike' && isset($_SESSION['id_user'])) {
+                // Remove like from database
+                $delete_like_sql = "DELETE FROM likes WHERE id_foto = :id_foto AND id_user = :id_user";
+                $delete_like_stmt = $conn->prepare($delete_like_sql);
+                $delete_like_stmt->bindParam(':id_foto', $id_foto, PDO::PARAM_INT);
+                $delete_like_stmt->bindParam(':id_user', $_SESSION['id_user'], PDO::PARAM_INT);
+                $delete_like_stmt->execute();
+            }
+            // Redirect to prevent resubmission
+            header("Location: ?id_foto=$id_foto");
+            exit;
+        }
+    
+        // Check if the user has liked the photo
         $isLiked = false;
         if (isset($_SESSION['id_user'])) {
-            $like_query = "SELECT COUNT(*) AS like_count FROM likes WHERE id_foto = :id_foto AND id_user = :id_user";
-            $like_stmt = $conn->prepare($like_query);
-            $like_stmt->bindParam(':id_foto', $id_foto, PDO::PARAM_INT);
-            $like_stmt->bindParam(':id_user', $_SESSION['id_user'], PDO::PARAM_INT);
-            $like_stmt->execute();
-            $like_result = $like_stmt->fetch(PDO::FETCH_ASSOC);
-            $isLiked = $like_result['like_count'] > 0;        
+            $like_check_query = "SELECT COUNT(*) AS like_count FROM likes WHERE id_foto = :id_foto AND id_user = :id_user";
+            $like_check_stmt = $conn->prepare($like_check_query);
+            $like_check_stmt->bindParam(':id_foto', $id_foto, PDO::PARAM_INT);
+            $like_check_stmt->bindParam(':id_user', $_SESSION['id_user'], PDO::PARAM_INT);
+            $like_check_stmt->execute();
+            $like_result = $like_check_stmt->fetch(PDO::FETCH_ASSOC);
+            $isLiked = $like_result['like_count'] > 0;
         }
-        $like_button_text = $isLiked ? 'Unlike' : 'Like';
 
         // Check if the user is logged in to determine like status and show/hide likes and comments
         $likes_and_comments = '';
         if (isset($_SESSION['id_user'])) {
             $likes_and_comments = '
-                <button id="likeButton" class="btn btn-primary mb-2">' . $like_button_text . '</button>
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Comments</h5>
@@ -229,6 +244,12 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-12 align-items-center">
                             <!-- Inside your HTML body -->
+                            <form method="post" action="">
+                                <input type="hidden" name="id_foto" value="<?php echo $id_foto; ?>">
+                                <button class="btn btn-primary" type="submit" name="like_action" value="<?php echo $isLiked ? 'Unlike' : 'Like'; ?>">
+                                    <?php echo $isLiked ? 'Unlike' : 'Like'; ?>
+                                </button>
+                            </form>
                             <?php
                                 echo $likes_and_comments;
                                 echo $edit_button;
@@ -251,38 +272,5 @@
     <?php
         require_once("layouts/footer.php");
     ?>
-    <script>
-        // Inside your JavaScript script tag
-    $(document).ready(function() {
-        $('#likeButton').click(function() {
-            var fotoId = <?php echo $id_foto; ?>;
-            var action = $(this).text() === 'Unlike' ? 'unlike' : 'like';
-            $.ajax({
-                url: 'like.php',
-                type: 'POST',
-                data: { foto_id: fotoId, like_action: action },
-                success: function(response) {
-                    switch(response.trim()) {
-                        case 'liked':
-                            $('#likeButton').text('Unlike');
-                            break;
-                        case 'unliked':
-                            $('#likeButton').text('Like');
-                            break;
-                        case 'login_required':
-                            alert('Please login to like the photo.');
-                            break;
-                        default:
-                            console.error('Unexpected response:', response);
-                            break;
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX Error:', error);
-                }
-            });
-        });
-    });
-    </script>
 </body>
 </html>
