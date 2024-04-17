@@ -28,8 +28,9 @@
 		}
         // Query the database to fetch user information
         if(isset($_SESSION['id_user']) && $_SESSION['id_user'] == $id_user) {
-            $edit_button = '<button class="btn btn-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/editalbum.php\'">Edit Album</button>';
+            $edit_button = '<button class="btn btn-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/editalbum.php?id_album=' . $id_album . '\'">Edit Album</button>';
             $delete_button = '<button class="btn btn-outline-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/deletealbum.php?id_album=' . $id_album . '\'">Delete Album</button>';
+            $post_button = '<button class="btn btn-outline-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/postphoto.php\'">Post Image</button>';
         }
 
         $user_query = "SELECT user.id_user, user.nama_user, user.username, album.nama_album, album.deskripsi FROM user
@@ -94,6 +95,7 @@
             <!-- Inside your HTML body -->
             <?php echo $edit_button; ?>
             <?php echo $delete_button; ?>
+            <?php echo $post_button; ?>
         </div>
     </div>
     <div class="container-fluid mb-5">
