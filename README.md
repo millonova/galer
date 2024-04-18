@@ -1,10 +1,6 @@
-# [Template Pintereso Bootstrap HTML](https://wowthemesnet.github.io/template-pintereso-bootstrap-html/) 
 
-#### [Live Demo](https://wowthemesnet.github.io/template-pintereso-bootstrap-html/)
 
 Pintereso is a [Bootstrap](https://getbootstrap.com/) 4.x template designed and developed by [WowThemesNet](https://www.wowthemes.net/) and distributed by [Bootstrap Starter](https://bootstrapstarter.com/). 
-
-![pintereso theme](docs/assets/img/screenshot.jpg)
 
 ## Beginners - How to use this template
 
@@ -80,6 +76,3 @@ To use this template, your computer needs:
 ### Additional Resources:
 - [Sass: Syntactically Awesome Style Sheets](http://sass-lang.com/)
 - [Bootstrap](https://getbootstrap.com/)
-- [Handlebars](http://handlebarsjs.com/)
-- [Panini](https://github.com/zurb/panini) 
-- [Gulp](https://gulpjs.org/getting-started)

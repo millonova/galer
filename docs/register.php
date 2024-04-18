@@ -1,7 +1,54 @@
 <?php  
     session_start();
-?>
 
+if(isset($message)){
+    foreach($message as $message){
+        echo '
+        <div class="message">
+        <span>'.$message.'</span>
+        <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
+        </div>
+        ';
+    }
+}
+require_once("db/conn.php");
+
+// Check if form is submitted
+if (isset($_POST['register'])) {
+    $nama_user = htmlspecialchars($_POST["nama_user"]);
+    $username = htmlspecialchars($_POST["username"]);
+    $email = htmlspecialchars($_POST["email"]);
+    $password = htmlspecialchars($_POST["password"]);
+    $hak_akses = 'client';
+    
+    // Check if username exists
+    $stmt = $conn->prepare("SELECT * FROM user WHERE username = ?");
+    $stmt->execute([$username]);
+    $username_exists = $stmt->fetch();
+
+    // Check if email exists
+    $stmt = $conn->prepare("SELECT * FROM user WHERE email = ?");
+    $stmt->execute([$email]);
+    $email_exists = $stmt->fetch();
+    
+    // If username or email already exists, display error
+    if ($username_exists || $email_exists) {
+        echo "<script>alert('Username or email already exists. Please choose a different one.');</script>";
+    } else {
+        // Hash password
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        
+        // Get current date and time
+        
+        // Insert new user into database
+        $stmt = $conn->prepare("INSERT INTO user (nama_user, username, email, password, hak_akses) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$nama_user, $username, $email, $hashed_password, $hak_akses]);
+        
+        echo "<script>alert('Registration successful! You can now log in.');</script>";
+    }
+}
+
+?>
 <!DOCTYPE html>  
 <html>  
     <head>  
@@ -19,56 +66,6 @@
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <body>
-    <?php
-   if(isset($message)){
-      foreach($message as $message){
-         echo '
-         <div class="message">
-            <span>'.$message.'</span>
-            <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
-         </div>
-         ';
-      }
-   }
-?>
-    <?php
-    require_once("db/conn.php");
-    
-    // Check if form is submitted
-    if (isset($_POST['register'])) {
-        $nama_user = htmlspecialchars($_POST["nama_user"]);
-        $username = htmlspecialchars($_POST["username"]);
-        $email = htmlspecialchars($_POST["email"]);
-        $password = htmlspecialchars($_POST["password"]);
-        
-        // Check if username exists
-        $stmt = $conn->prepare("SELECT * FROM user WHERE username = ?");
-        $stmt->execute([$username]);
-        $username_exists = $stmt->fetch();
-
-        // Check if email exists
-        $stmt = $conn->prepare("SELECT * FROM user WHERE email = ?");
-        $stmt->execute([$email]);
-        $email_exists = $stmt->fetch();
-        
-        // If username or email already exists, display error
-        if ($username_exists || $email_exists) {
-            echo "<script>alert('Username or email already exists. Please choose a different one.');</script>";
-        } else {
-            // Hash password
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            
-            // Get current date and time
-            
-            // Insert new user into database
-            $stmt = $conn->prepare("INSERT INTO user (nama_user, username, email, password) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$nama_user, $username, $email, $hashed_password]);
-            
-            echo "<script>alert('Registration successful! You can now log in.');</script>";
-        }
-    }
-
-    ?>
     <div class="row">
             <div class="container mt-5 px-3 py-3 card col-5">
                 <div class="card-body mt-2">

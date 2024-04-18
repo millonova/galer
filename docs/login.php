@@ -54,6 +54,7 @@
                         $_SESSION['nama_user'] = $row['nama_user'];
                         $_SESSION['id_user'] = $row['id_user'];
                         $_SESSION['username'] = $row['username'];
+                        $_SESSION['hak_akses'] = $row['hak_akses'];
                         
                         // Set login session
                         $_SESSION['login'] = true;
@@ -65,7 +66,7 @@
                         }
             
                         // Redirect to profile page
-                        header("Location: http://localhost/galer/docs/.php");
+                        header("Location: http://localhost/galer/docs/index.php");
                         exit();
                     } else {
                         // Incorrect password

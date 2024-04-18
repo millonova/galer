@@ -26,36 +26,40 @@ if (isset($_POST['daftar'])) {
     if (empty($judul_foto)) {
         $error = "Judul foto is required.";
     }
-    // Add more validation rules as needed
 
-    if (empty($error)) {
-        $uploadedFile = $_FILES["gambar"];
+    $uploadedFile = $_FILES["gambar"];
 
-        if ($uploadedFile["error"] === UPLOAD_ERR_OK) {
-            $gambarNama = $uploadedFile["name"];
-            $lokasi_file = $_SERVER['DOCUMENT_ROOT'] . "/galer/image/" . $gambarNama;
+    // Check for file size > 20 MB
+    if ($uploadedFile['size'] > 20971520) { // 20 MB in bytes
+        $error = "File size must not exceed 20 MB.";
+    }
 
-            if (move_uploaded_file($uploadedFile["tmp_name"], $lokasi_file)) {
-                try {
-                    // Insert photo data into the database
-                    $sql = 'INSERT INTO foto (id_foto, judul_foto, deskripsi, tgl_unggah, lokasi_file, id_album, id_user) VALUES (?, ?, ?, ?, ?, ?, ?)';
-                    $stmt = $conn->prepare($sql);
-                    $stmt->execute([$id_foto, $judul_foto, $deskripsi, $tgl_unggah, $lokasi_file, $id_album, $id_user]);
+    if ($uploadedFile["error"] === UPLOAD_ERR_OK && empty($error)) {
+        $gambarNama = $uploadedFile["name"];
+        $lokasi_file = $_SERVER['DOCUMENT_ROOT'] . "/galer/image/" . $gambarNama;
 
-                    echo "Gambar berhasil diunggah dan disimpan di basis data.";
-                } catch (PDOException $e) {
-                    echo "Failed to connect to or operate on the database: " . $e->getMessage();
-                }
-            } else {
-                echo "Gagal mengunggah gambar ke server.";
+        if (move_uploaded_file($uploadedFile["tmp_name"], $lokasi_file)) {
+            try {
+                // Insert photo data into the database
+                $sql = 'INSERT INTO foto (id_foto, judul_foto, deskripsi, tgl_unggah, lokasi_file, id_album, id_user) VALUES (?, ?, ?, ?, ?, ?, ?)';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([$id_foto, $judul_foto, $deskripsi, $tgl_unggah, $lokasi_file, $id_album, $id_user]);
+
+                echo "Gambar berhasil diunggah dan disimpan di basis data.";
+            } catch (PDOException $e) {
+                echo "Failed to connect to or operate on the database: " . $e->getMessage();
             }
         } else {
-            echo "Terjadi kesalahan saat mengunggah gambar.";
+            echo "Gagal mengunggah gambar ke server.";
         }
     } else {
+        if ($uploadedFile["error"] !== UPLOAD_ERR_OK) {
+            echo "Terjadi kesalahan saat mengunggah gambar.";
+        }
         echo $error;
     }
 }
+
 $query = "SELECT id_album, nama_album FROM album WHERE id_user = :id_user";
 $stmt = $conn->prepare($query);
 $stmt->bindParam(':id_user', $_SESSION['id_user'], PDO::PARAM_INT);

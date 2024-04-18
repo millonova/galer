@@ -15,8 +15,6 @@
             You may remove the links only if you donate:
             https://www.wowthemes.net/freebies-license/
         -->
-        <p>©  <span class="credits font-weight-bold">        
-        <a target="_blank" class="text-dark" href="https://www.wowthemes.net/pintereso-free-html-bootstrap-template/"><u>Pintereso Bootstrap HTML Template</u> by WowThemes.net.</a>
         </span>
         </p>
     </div>

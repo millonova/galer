@@ -43,7 +43,7 @@
         if(isset($_SESSION['id_user'])) {
             // Display edit and delete buttons only if the user is the owner of the photo
             if ($_SESSION['id_user'] == $id_user) {
-                $edit_button = '<button class="btn btn-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/editprofile.php\'">Edit Image</button>';
+                $edit_button = '<button class="btn btn-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/editphoto.php?id_foto=' . $id_foto . '\'">Edit Image</button>';
                 $delete_button = '<button class="btn btn-outline-danger mb-2" onclick="window.location.href=\'http://localhost/galer/docs/crud/deletephoto.php?id_foto=' . $id_foto . '\'">Delete Image</button>';
             }
             // Display comment form for the owner of the photo or for any logged-in user
