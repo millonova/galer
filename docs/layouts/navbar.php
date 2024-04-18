@@ -8,6 +8,18 @@
     		<li class="nav-item">
     		<a class="nav-link active" href="http://localhost/galer/docs/index.php">Home</a>
     		</li>
+			<?php
+			 if ($_SESSION['hak_akses'] == 'admin') : ?>
+				<li class="nav-item">
+				<a class="nav-link text-danger" href="http://localhost/galer/docs/admin/data-foto.php">Data Foto</a>
+				</li>
+				<li class="nav-item">
+				<a class="nav-link text-danger" href="http://localhost/galer/docs/admin/data-user.php">Data User</a>
+				</li>
+				<li class="nav-item">
+				<a class="nav-link text-danger" href="http://localhost/galer/docs/admin/report.php">Report</a>
+				</li>
+			<?php endif; ?>
     		<li class="nav-item for-not-logged-in">
     		<a class="nav-link text-danger for-not-logged-in" href="http://localhost/galer/docs/login.php">Log in</a>
     		</li>

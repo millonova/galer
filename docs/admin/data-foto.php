@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once("../db/conn.php");
+$hak = $_SESSION['hak_akses']
 ?>
 <!DOCTYPE html>  
 <html>  
